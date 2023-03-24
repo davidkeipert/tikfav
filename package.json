@@ -1,0 +1,11 @@
+{
+  "name": "tikfav",
+  "version": "1.0.0",
+  "description": "Download your tiktok favorites using the user data download files from tiktok",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
