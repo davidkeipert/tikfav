@@ -1,11 +1,16 @@
 {
   "name": "tikfav",
   "version": "1.0.0",
+  "type": "module",
   "description": "Download your tiktok favorites using the user data download files from tiktok",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.3",
+    "node-fetch": "^3.3.1"
+  }
 }

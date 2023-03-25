@@ -128,3 +128,9 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# TikTok user data files
+user_data.json
+
+*.mp4
+.vscode
