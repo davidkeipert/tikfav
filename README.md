@@ -11,6 +11,5 @@ To download your favorited videos from TikTok, you'll need to request your user 
 
 # Todo
 
-- add history logging to prevent duplicate downloads
 - add option to pass a user data JSON file at runtime
 - improve video file naming scheme
