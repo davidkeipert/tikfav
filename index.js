@@ -3,10 +3,10 @@ import fetch from 'node-fetch'
 import { readFileSync } from "fs";
 import fs from 'fs';
 import { pipeline } from "stream/promises";
+import { openHistory } from "./history.js";
 
 //import dotenv file with API key
 dotenv.config();
-
 
 // API HTTP request template
 const options = {
@@ -18,11 +18,11 @@ const options = {
     },
 }
 
-
-
 const data = readFileSync('./user_data.json');
 const info = JSON.parse(data);
 let list = info["Activity"]["Favorite Videos"]["FavoriteVideoList"];
+
+let history = await openHistory();
 
 async function videoData(url) {
     // add the url to the query parameters
@@ -48,16 +48,25 @@ list.forEach(async vid => {
 
 });
 */
+// open writeStream for history file
+var writeHistory = fs.createWriteStream("history.txt", { flags: "a" });
 for (let i = 0; i < 10; i++) {
     //get data from an entry in the Favorites list
     let favoriteVid = list[i];
     let favoriteURL = favoriteVid.Link;
     let vidDate = favoriteVid.Date;
-    console.log(favoriteURL)
+    if (history.indexOf(favoriteURL) != -1) {
+        console.log("Video was found in history file, skipping.")
+        continue;
+    }
+
+    console.log("Now processing: " + favoriteURL)
+
     // get the video information from API and check for errors.
     // if the tiktok has been deleted, or there's another issue with the URL, it's logged and skipped
     var responseData = await videoData(favoriteURL);
     console.log(responseData)
+
     if (responseData.code != 0) {
         console.log('error saving video from URL ' + favoriteURL);
         continue;
@@ -78,6 +87,9 @@ for (let i = 0; i < 10; i++) {
     file.on('finish', () => {
         console.log(`finished writing video`);
         file.close();
+    })
+    writeHistory.write('\n' + favoriteURL, (error) => {
+        console.log(error);
     })
 
 
