@@ -4,15 +4,12 @@
   "type": "module",
   "description": "Download your tiktok favorites using the user data download files from tiktok",
   "main": "index.js",
-  "bin": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "chalk": "^5.2.0",
-    "commander": "^10.0.0",
     "dotenv": "^16.0.3",
     "node-fetch": "^3.3.1"
   }
