@@ -17,13 +17,15 @@ const options = {
         'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com'
     },
 }
-
+//read and parse user data file JSON and gets the list of Favorite Videos
 const data = readFileSync('./user_data.json');
 const info = JSON.parse(data);
 let list = info["Activity"]["Favorite Videos"]["FavoriteVideoList"];
 
+// openHistory returns an array of strings containing all the URL's in the history file
 let history = await openHistory();
 
+//fetch video info from API
 async function videoData(url) {
     // add the url to the query parameters
     const encodedParams = new URLSearchParams();
@@ -50,6 +52,7 @@ list.forEach(async vid => {
 */
 // open writeStream for history file
 var writeHistory = fs.createWriteStream("history.txt", { flags: "a" });
+
 for (let i = 0; i < 10; i++) {
     //get data from an entry in the Favorites list
     let favoriteVid = list[i];
@@ -88,6 +91,7 @@ for (let i = 0; i < 10; i++) {
         console.log(`finished writing video`);
         file.close();
     })
+    // write URL to history file after download is finished
     writeHistory.write('\n' + favoriteURL, (error) => {
         console.log(error);
     })
