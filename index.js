@@ -1,4 +1,4 @@
-#! /usr/bin/env node
+//#! /usr/bin/env node
 
 import { program } from "commander";
 import dotenv from "dotenv";
@@ -40,7 +40,7 @@ try {
 }
 try {
     const info = JSON.parse(data);
-    let list = info["Activity"]["Favorite Videos"]["FavoriteVideoList"];
+    var list = info["Activity"]["Favorite Videos"]["FavoriteVideoList"];
 
 } catch (error) {
     program.error("Couldn't parse JSON data. Make sure you have chosen an unmodified TikTok data JSON file.")
