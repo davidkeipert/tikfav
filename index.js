@@ -1,9 +1,23 @@
+#! /usr/bin/env node
+
+import { program } from "commander";
 import dotenv from "dotenv";
 import fetch from 'node-fetch'
 import { readFileSync } from "fs";
 import fs from 'fs';
 import { pipeline } from "stream/promises";
 import { openHistory } from "./history.js";
+
+//commander setup
+program
+    .version('1.0.0')
+    .name('TikFav')
+    .option('-u <value>', 'choose user data file', 'user_data.json')
+    .parse();
+
+const opts = program.opts();
+const userDataFile = opts.u;
+console.log(opts.u)
 
 //import dotenv file with API key
 dotenv.config();
@@ -18,9 +32,19 @@ const options = {
     },
 }
 //read and parse user data file JSON and gets the list of Favorite Videos
-const data = readFileSync('./user_data.json');
-const info = JSON.parse(data);
-let list = info["Activity"]["Favorite Videos"]["FavoriteVideoList"];
+try {
+    var data = readFileSync(`./${userDataFile}`);
+} catch (error) {
+    //console.log("Error reading userdata file:", error);
+    program.error("Couldn't read user data file, does it exist?");
+}
+try {
+    const info = JSON.parse(data);
+    let list = info["Activity"]["Favorite Videos"]["FavoriteVideoList"];
+
+} catch (error) {
+    program.error("Couldn't parse JSON data. Make sure you have chosen an unmodified TikTok data JSON file.")
+}
 
 // openHistory returns an array of strings containing all the URL's in the history file
 let history = await openHistory();
