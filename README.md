@@ -27,5 +27,7 @@ TikFav saves the url's of videos you download to a file called `history.txt`. Th
 
 # Todo
 
-- add option to pass a user data JSON file at runtime
-- improve video file naming scheme
+- [x] add option to pass a user data JSON file at runtime
+- [x] improve video file naming scheme
+- [] move data iteration looping to production state
+- [] add command line option to pass API key
