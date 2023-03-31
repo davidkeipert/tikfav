@@ -9,6 +9,48 @@ import fs from 'fs';
 import { pipeline } from "stream/promises";
 import { openHistory } from "./history.js";
 import { setTimeout } from "timers/promises";
+
+//import dotenv file with API key
+if (process.env.NODE_ENV === 'development') {
+    dotenv.config();
+}
+
+// API key setup
+var apiKey = process.env.RAPIDAPIKEY;
+if (apiKey == undefined) {
+    program.error(chalk.red("No API key was provided. Please set your API key as an env variable called RAPIDAPIKEY."));
+}
+// API HTTP request template
+const options = {
+    method: 'POST',
+    headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        'X-RapidAPI-Key': apiKey,
+        'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com'
+    },
+}
+
+//fetch video info from API
+async function getVideoData(url) {
+    // add the url to the query parameters
+    const encodedParams = new URLSearchParams();
+    encodedParams.append("url", url);
+    encodedParams.append("hd", "1");
+    // copy the options object with our API key and add the parameters as the body
+    let fetchOptions = options;
+    fetchOptions.body = encodedParams;
+
+    // Make POST request using fetch, get JSON from response, and return the data
+    const response = await fetch('https://tiktok-video-no-watermark2.p.rapidapi.com/', fetchOptions);
+    var responseData = await response.json();
+    // Log response status, calling function will handle errors
+    if (process.env.NODE_ENV === 'development') {
+        console.log(responseData);
+        console.log(chalk.white('Got metadata with HTTP response ' + response.status));
+    }
+    return responseData;
+}
+
 //commander setup
 const program = new Command();
 program
@@ -22,21 +64,12 @@ const opts = program.opts();
 const userDataFile = opts.u;
 console.log(chalk.green('Reading from user data file ' + opts.u))
 
-//import dotenv file with API key
-if (process.env.NODE_ENV === 'development') {
-    dotenv.config();
-}
+
+
+
 console.log(process.env.NODE_ENV);
 
-// API HTTP request template
-const options = {
-    method: 'POST',
-    headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        'X-RapidAPI-Key': process.env.RAPIDAPIKEY,
-        'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com'
-    },
-}
+
 //read and parse user data file JSON and gets the list of Favorite Videos
 try {
     var data = readFileSync(`./${userDataFile}`);
@@ -55,27 +88,7 @@ try {
 // openHistory returns an array of strings containing all the URL's in the history file
 let history = await openHistory();
 
-//fetch video info from API
-async function videoData(url) {
-    // add the url to the query parameters
-    const encodedParams = new URLSearchParams();
-    encodedParams.append("url", url);
-    encodedParams.append("hd", "1");
-    // copy the options object with our API key and add the parameters as the body
-    let fetchOptions = options;
-    fetchOptions.body = encodedParams;
 
-    // Make POST request using fetch, get JSON from response, and return the data
-    const response = await fetch('https://tiktok-video-no-watermark2.p.rapidapi.com/', fetchOptions);
-    var responseData = await response.json();
-    // Log response status, calling function will handle errors
-    if (process.env.NODE_ENV === 'development') {
-        console.log(responseData);
-        console.log(chalk.white('Got metadata with HTTP response ' + response.status));
-    }
-    return responseData;
-
-}
 
 // Create download folder if it doesn't exist
 let dlFolder = './tiktok-downloads/favorites'
@@ -89,13 +102,13 @@ try {
     console.log(error);
     program.error("Couldn't create download directories. Please make sure you have permission to write to this folder.");
 }
-/*
-list.forEach(async vid => {        
- 
-    
- 
-});
-*/
+
+/* list.forEach(async vid => {
+
+
+
+}); */
+
 // open writeStream for history file
 var writeHistory = fs.createWriteStream("history.txt", { flags: "a" });
 
@@ -113,7 +126,7 @@ for (let i = 0; i < 10; i++) {
 
     // get the video information from API and check for errors.
     // if the tiktok has been deleted, or there's another issue with the URL, it's logged and skipped
-    var responseData = await videoData(favoriteURL);
+    var responseData = await getVideoData(favoriteURL);
     // very mid way to avoid API rate limits by setting a 1 sec timeout after every metadata API call
     await setTimeout(250);
     if (responseData.code != 0) {
