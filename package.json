@@ -4,7 +4,9 @@
   "type": "module",
   "description": "Download your tiktok favorites using the user data download files from tiktok",
   "main": "index.js",
-  "bin": "index.js",
+  "bin": {
+    "tikfav": "./index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

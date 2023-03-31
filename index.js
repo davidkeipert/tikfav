@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 
-import { program } from "commander";
+import { Command } from "commander";
+import chalk from "chalk";
 import dotenv from "dotenv";
 import fetch from 'node-fetch'
 import { readFileSync } from "fs";
@@ -9,15 +10,17 @@ import { pipeline } from "stream/promises";
 import { openHistory } from "./history.js";
 
 //commander setup
+const program = new Command();
 program
     .version('1.0.0')
-    .name('TikFav')
-    .option('-u <value>', 'choose user data file', 'user_data.json')
-    .parse();
+    .name('tikfav')
+    .description('Downloader utility that downloads your favorite videos from your TikTok user data file.')
+    .option('-u <json file>', 'choose user data file', 'user_data.json')
+    .parse(process.argv);
 
 const opts = program.opts();
 const userDataFile = opts.u;
-console.log(opts.u)
+console.log(chalk.green('Reading from user data file' + opts.u))
 
 //import dotenv file with API key
 dotenv.config();
@@ -36,14 +39,14 @@ try {
     var data = readFileSync(`./${userDataFile}`);
 } catch (error) {
     //console.log("Error reading userdata file:", error);
-    program.error("Couldn't read user data file, does it exist?");
+    program.error(chalk.red("Couldn't read user data file, does it exist?"));
 }
 try {
     const info = JSON.parse(data);
     var list = info["Activity"]["Favorite Videos"]["FavoriteVideoList"];
 
 } catch (error) {
-    program.error("Couldn't parse JSON data. Make sure you have chosen an unmodified TikTok data JSON file.")
+    program.error(chalk.red("Couldn't parse JSON data. Make sure you have chosen an unmodified TikTok data JSON file."))
 }
 
 // openHistory returns an array of strings containing all the URL's in the history file
@@ -66,6 +69,19 @@ async function videoData(url) {
     console.log(response.status)
     return responseData;
 
+}
+
+// Create download folder if it doesn't exist
+let dlFolder = './tiktok-downloads/favorites'
+try {
+    if (!fs.existsSync(dlFolder)) {
+        fs.mkdirSync(dlFolder, { recursive: true }, (err) => {
+            if (err) throw err;
+        });
+    }
+} catch (error) {
+    console.log(error);
+    program.error("Couldn't create download directories. Please make sure you have permission to write to this folder.");
 }
 /*
 list.forEach(async vid => {        
@@ -107,7 +123,7 @@ for (let i = 0; i < 10; i++) {
     let videoFile = await fetch(vidURL);
 
     //set filename and create a WriteStream
-    let filename = `./${vidDate}_${author}_${createTime}.mp4`;
+    let filename = `${dlFolder}/${vidDate}_${author}_${createTime}.mp4`;
     let file = fs.createWriteStream(filename);
     //write the response body to a file
     await pipeline(videoFile.body, file);
