@@ -1,4 +1,5 @@
 import { open } from 'node:fs/promises'
+import chalk from 'chalk';
 
 export async function openHistory() {
     const historyFile = await open('./history.txt', 'a+');
@@ -6,7 +7,8 @@ export async function openHistory() {
     for await (const line of historyFile.readLines()) {
         history.push(line);
     }
-    console.log(chalk.cyan('Read ' + history.size + ' lines from history file.'));
+    if (history.length > 0)
+        console.log(chalk.cyan('Read ' + history.length + ' lines from history file.'));
 
     return history;
 }

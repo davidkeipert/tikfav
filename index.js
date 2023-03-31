@@ -23,14 +23,17 @@ const userDataFile = opts.u;
 console.log(chalk.green('Reading from user data file ' + opts.u))
 
 //import dotenv file with API key
-dotenv.config();
+if (process.env.NODE_ENV === 'development') {
+    dotenv.config();
+}
+console.log(process.env.NODE_ENV);
 
 // API HTTP request template
 const options = {
     method: 'POST',
     headers: {
         'content-type': 'application/x-www-form-urlencoded',
-        'X-RapidAPI-Key': process.env.APIKEY,
+        'X-RapidAPI-Key': process.env.RAPIDAPIKEY,
         'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com'
     },
 }
@@ -66,7 +69,10 @@ async function videoData(url) {
     const response = await fetch('https://tiktok-video-no-watermark2.p.rapidapi.com/', fetchOptions);
     var responseData = await response.json();
     // Log response status, calling function will handle errors
-    console.log(chalk.white('Got metadata with HTTP response ' + response.status));
+    if (process.env.NODE_ENV === 'development') {
+        console.log(responseData);
+        console.log(chalk.white('Got metadata with HTTP response ' + response.status));
+    }
     return responseData;
 
 }
@@ -85,9 +91,9 @@ try {
 }
 /*
 list.forEach(async vid => {        
-
+ 
     
-
+ 
 });
 */
 // open writeStream for history file
@@ -110,7 +116,7 @@ for (let i = 0; i < 10; i++) {
     var responseData = await videoData(favoriteURL);
 
     if (responseData.code != 0) {
-        console.log('error saving video from URL ' + favoriteURL);
+        console.log(chalk.red('Error getting video metadata for URL ' + favoriteURL));
         continue;
     }
     // get the mp4 URL and metadata from the API response
