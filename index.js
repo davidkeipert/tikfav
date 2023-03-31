@@ -8,7 +8,7 @@ import { readFileSync } from "fs";
 import fs from 'fs';
 import { pipeline } from "stream/promises";
 import { openHistory } from "./history.js";
-
+import { setTimeout } from "timers/promises";
 //commander setup
 const program = new Command();
 program
@@ -114,7 +114,8 @@ for (let i = 0; i < 10; i++) {
     // get the video information from API and check for errors.
     // if the tiktok has been deleted, or there's another issue with the URL, it's logged and skipped
     var responseData = await videoData(favoriteURL);
-
+    // very mid way to avoid API rate limits by setting a 1 sec timeout after every metadata API call
+    await setTimeout(250);
     if (responseData.code != 0) {
         console.log(chalk.red('Error getting video metadata for URL ' + favoriteURL));
         continue;
