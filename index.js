@@ -20,7 +20,7 @@ program
 
 const opts = program.opts();
 const userDataFile = opts.u;
-console.log(chalk.green('Reading from user data file' + opts.u))
+console.log(chalk.green('Reading from user data file ' + opts.u))
 
 //import dotenv file with API key
 dotenv.config();
@@ -66,7 +66,7 @@ async function videoData(url) {
     const response = await fetch('https://tiktok-video-no-watermark2.p.rapidapi.com/', fetchOptions);
     var responseData = await response.json();
     // Log response status, calling function will handle errors
-    console.log(response.status)
+    console.log(chalk.white('Got metadata with HTTP response ' + response.status));
     return responseData;
 
 }
@@ -99,16 +99,15 @@ for (let i = 0; i < 10; i++) {
     let favoriteURL = favoriteVid.Link;
     let vidDate = favoriteVid.Date;
     if (history.indexOf(favoriteURL) != -1) {
-        console.log("Video was found in history file, skipping.")
+        console.log(chalk.magenta("Video was found in history file, skipping."));
         continue;
     }
 
-    console.log("Now processing: " + favoriteURL)
+    console.log(chalk.green("Getting video metadata for: " + favoriteURL));
 
     // get the video information from API and check for errors.
     // if the tiktok has been deleted, or there's another issue with the URL, it's logged and skipped
     var responseData = await videoData(favoriteURL);
-    console.log(responseData)
 
     if (responseData.code != 0) {
         console.log('error saving video from URL ' + favoriteURL);
@@ -128,12 +127,12 @@ for (let i = 0; i < 10; i++) {
     //write the response body to a file
     await pipeline(videoFile.body, file);
     file.on('finish', () => {
-        console.log(`finished writing video`);
+        console.log(chalk.greenBright(`Finished downloading video ` + favoriteURL));
         file.close();
     })
     // write URL to history file after download is finished
     writeHistory.write('\n' + favoriteURL, (error) => {
-        console.log(error);
+        console.log(chalk.bgRed.white(error));
     })
 
 

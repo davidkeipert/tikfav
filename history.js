@@ -4,9 +4,9 @@ export async function openHistory() {
     const historyFile = await open('./history.txt', 'a+');
     var history = [];
     for await (const line of historyFile.readLines()) {
-        console.log('read line ' + history.push(line) + ' from history');
-
+        history.push(line);
     }
+    console.log(chalk.cyan('Read ' + history.size + ' lines from history file.'));
 
     return history;
 }
