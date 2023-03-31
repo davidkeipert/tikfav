@@ -7,8 +7,10 @@ export async function openHistory() {
     for await (const line of historyFile.readLines()) {
         history.push(line);
     }
-    if (history.length > 0)
+    if (history.length > 0) {
         console.log(chalk.cyan('Read ' + history.length + ' lines from history file.'));
+
+    }
 
     return history;
 }
