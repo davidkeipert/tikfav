@@ -131,7 +131,10 @@ dist
 
 # TikTok user data files
 user_data.json
+test.json
 
 *.mp4
 .vscode
 history.txt
+
+tiktok-downloads
