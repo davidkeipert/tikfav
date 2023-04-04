@@ -106,11 +106,10 @@ try {
 // open writeStream for history file
 var writeHistory = fs.createWriteStream("history.txt", { flags: "a" });
 
-for (let i = 0; i < 10; i++) {
+for(const video of list) {
     //get data from an entry in the Favorites list
-    let favoriteVid = list[i];
-    let favoriteURL = favoriteVid.Link;
-    let vidDate = favoriteVid.Date;
+    let favoriteURL = video.Link;
+    let vidDate = video.Date;
     if (history.indexOf(favoriteURL) != -1) {
         console.log(chalk.magenta("Video was found in history file, skipping."));
         continue;
@@ -150,4 +149,4 @@ for (let i = 0; i < 10; i++) {
     })
 
 
-}
+};
