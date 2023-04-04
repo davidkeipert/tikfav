@@ -1,8 +1,7 @@
 #! /usr/bin/env node
 
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import chalk from "chalk";
-import dotenv from "dotenv";
 import fetch from 'node-fetch'
 import { readFileSync } from "fs";
 import fs from 'fs';
@@ -10,16 +9,6 @@ import { pipeline } from "stream/promises";
 import { openHistory } from "./history.js";
 import { setTimeout } from "timers/promises";
 
-//import dotenv file with API key
-if (process.env.NODE_ENV === 'development') {
-    dotenv.config();
-}
-
-// API key setup
-var apiKey = process.env.RAPIDAPIKEY;
-if (apiKey == undefined) {
-    program.error(chalk.red("No API key was provided. Please set your API key as an env variable called RAPIDAPIKEY."));
-}
 // API HTTP request template
 const options = {
     method: 'POST',
@@ -58,10 +47,15 @@ program
     .name('tikfav')
     .description('Downloader utility that downloads your favorite videos from your TikTok user data file.')
     .option('-u <json file>', 'choose user data file', 'user_data.json')
-    .parse(process.argv);
+    .requiredOption('-k, --key <key>', 'your RapidAPI key')
+    .parse();
 
 const opts = program.opts();
 const userDataFile = opts.u;
+var apiKey = opts.k;
+if(apiKey != undefined){
+    console.log(chalk.green.bold('Using RapidAPI key ' + apiKey));
+}
 console.log(chalk.green('Reading from user data file ' + opts.u))
 
 
