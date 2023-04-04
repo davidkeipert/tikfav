@@ -21,13 +21,15 @@ You'll need to set this key as an environment variable named `RAPIDAPIKEY`:
 ## Usage  
 Run `tiksave`. It will look for a data file called user_data.json by default. If yours has a different name, or resides in a different directroy, specify the path with the `-u` option.
 
-Make sure you have set the RAPIDAPIKEY env variable to your key. TikSave will create a folder called `tiktok-downloads` in the current directory.
+### Options
+`-k` your RapidAPI key, REQUIRED
+`-u` path to user data file, default is ./user_data.json
 
-TikFav saves the url's of videos you download to a file called `history.txt`. This is useful if you periodically request a data download from tiktok and only want to download videos you don't already have.
+TikFav saves the url's of videos you download to a file called `history.txt`. This is useful if you want to periodically request a data download from tiktok and only download videos you don't already have.
 
 # Todo
 
 - [x] add option to pass a user data JSON file at runtime
 - [x] improve video file naming scheme
 - [ ] move data iteration looping to production state
-- [ ] add command line option to pass API key
+- [x] add command line option to pass API key
