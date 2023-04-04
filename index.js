@@ -33,7 +33,7 @@ async function getVideoData(url) {
 //commander setup
 const program = new Command();
 program
-    .version('1.0.0')
+    .version('1.0.2')
     .name('tikfav')
     .description('Downloader utility that downloads your favorite videos from your TikTok user data file.')
     .option('-u <json file>', 'choose user data file', 'user_data.json')
