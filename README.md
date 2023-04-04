@@ -12,8 +12,7 @@ To use this tool you'll need to download your user data from Tiktok by going to 
 ### Video Download API Key
 
 Sign up for either a free or paid plan here: https://rapidapi.com/yi005/api/tiktok-video-no-watermark2  
-You'll need to set this key as an environment variable named `RAPIDAPIKEY`:  
-`export RAPIDAPIKEY='yourKey'`
+You'll need to set this key to the app with the -k option at runtime.
 
 ## Installation  
 `npm install -g tikfav`
