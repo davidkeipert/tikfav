@@ -9,16 +9,6 @@ import { pipeline } from "stream/promises";
 import { openHistory } from "./history.js";
 import { setTimeout } from "timers/promises";
 
-// API HTTP request template
-const options = {
-    method: 'POST',
-    headers: {
-        'content-type': 'application/x-www-form-urlencoded',
-        'X-RapidAPI-Key': apiKey,
-        'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com'
-    },
-}
-
 //fetch video info from API
 async function getVideoData(url) {
     // add the url to the query parameters
@@ -47,7 +37,7 @@ program
     .name('tikfav')
     .description('Downloader utility that downloads your favorite videos from your TikTok user data file.')
     .option('-u <json file>', 'choose user data file', 'user_data.json')
-    .requiredOption('-k, --key <key>', 'your RapidAPI key')
+    .requiredOption('-k <key>', 'your RapidAPI key')
     .parse();
 
 const opts = program.opts();
@@ -58,11 +48,15 @@ if(apiKey != undefined){
 }
 console.log(chalk.green('Reading from user data file ' + opts.u))
 
-
-
-
-console.log(process.env.NODE_ENV);
-
+// API HTTP request template
+const options = {
+    method: 'POST',
+    headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+        'X-RapidAPI-Key': apiKey,
+        'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com'
+    },
+}
 
 //read and parse user data file JSON and gets the list of Favorite Videos
 try {
@@ -106,7 +100,8 @@ try {
 // open writeStream for history file
 var writeHistory = fs.createWriteStream("history.txt", { flags: "a" });
 
-for(const video of list) {
+for(let i = 0; i < list.length; i++) {
+    let video = list[i];
     //get data from an entry in the Favorites list
     let favoriteURL = video.Link;
     let vidDate = video.Date;
@@ -122,8 +117,13 @@ for(const video of list) {
     var responseData = await getVideoData(favoriteURL);
     // very mid way to avoid API rate limits by setting a 1 sec timeout after every metadata API call
     await setTimeout(250);
+
     if (responseData.code != 0) {
+        if(responseData.code = -1){
+            console.log(chalk.red("Couldn't get data for this URL, video may be deleted"))
+        }else{
         console.log(chalk.red('Error getting video metadata for URL ' + favoriteURL));
+        }
         continue;
     }
     // get the mp4 URL and metadata from the API response
