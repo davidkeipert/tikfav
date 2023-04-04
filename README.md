@@ -12,21 +12,21 @@ To use this tool you'll need to download your user data from Tiktok by going to 
 ### Video Download API Key
 
 Sign up for either a free or paid plan here: https://rapidapi.com/yi005/api/tiktok-video-no-watermark2  
-You'll need to set this key as an environment variable named `RAPIDAPIKEY`:  
-`export RAPIDAPIKEY='yourKey'`
+You'll need to set this key to the app with the -k option at runtime.
 
 ## Installation  
-`npm install -g tiksave`
+`npm install -g tikfav`
 
 ## Usage  
-Run `tiksave`. It will look for a data file called user_data.json by default. If yours has a different name, or resides in a different directroy, specify the path with the `-u` option.
+Run `tikfav`. It will look for a data file called user_data.json by default. If yours has a different name, or resides in a different directroy, specify the path with the `-u` option.
 
 ### Options
-`-k` your RapidAPI key, REQUIRED 
-
+`-k` your RapidAPI key, REQUIRED  
 `-u` path to user data file, default is ./user_data.json
 
 TikFav saves the url's of videos you download to a file called `history.txt`. This is useful if you want to periodically request a data download from tiktok and only download videos you don't already have.
+
+Videos are downloaded to a subfolder called `tiktok-downloads` in whichever directory you run the app.
 
 # Todo
 
