@@ -23,6 +23,7 @@ Run `tiksave`. It will look for a data file called user_data.json by default. If
 
 ### Options
 `-k` your RapidAPI key, REQUIRED 
+
 `-u` path to user data file, default is ./user_data.json
 
 TikFav saves the url's of videos you download to a file called `history.txt`. This is useful if you want to periodically request a data download from tiktok and only download videos you don't already have.
@@ -33,4 +34,4 @@ TikFav saves the url's of videos you download to a file called `history.txt`. Th
 - [x] improve video file naming scheme
 - [x] move data iteration looping to production state
 - [x] add command line option to pass API key
-- [] add option to download liked videos instead of favorites
+- [ ] add option to download liked videos instead of favorites
