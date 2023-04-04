@@ -33,7 +33,7 @@ async function getVideoData(url) {
 //commander setup
 const program = new Command();
 program
-    .version('1.0.3')
+    .version('1.0.4')
     .name('tikfav')
     .description('Downloader utility that downloads your favorite videos from your TikTok user data file.')
     .option('-u <json file>', 'choose user data file', 'user_data.json')
@@ -99,8 +99,11 @@ try {
 
 // open writeStream for history file
 var writeHistory = fs.createWriteStream("history.txt", { flags: "a" });
+//count successfully downloaded videos
+let DLCount =0;
 
 for(let i = 0; i < list.length; i++) {
+    let qLength = list.length;
     let video = list[i];
     //get data from an entry in the Favorites list
     let favoriteURL = video.Link;
@@ -142,11 +145,15 @@ for(let i = 0; i < list.length; i++) {
         console.log(chalk.greenBright(`Finished downloading video ` + favoriteURL));
         file.close();
     })
+    console.log(chalk.blue(`Downloading video ${i}/${qLength}...`));
     await pipeline(videoFile.body, file);
     
     
     // write URL to history file after download is finished
     writeHistory.write('\n' + favoriteURL)
+    DLCount++;
 
 
 };
+
+console.log(chalk.greenBright('Saved ' + DLCount + ' videos. Goodbye.'));
