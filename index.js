@@ -138,15 +138,15 @@ for(let i = 0; i < list.length; i++) {
     let filename = `${dlFolder}/${vidDate}_${author}_${createTime}.mp4`;
     let file = fs.createWriteStream(filename);
     //write the response body to a file
-    await pipeline(videoFile.body, file);
     file.on('finish', () => {
         console.log(chalk.greenBright(`Finished downloading video ` + favoriteURL));
         file.close();
     })
+    await pipeline(videoFile.body, file);
+    
+    
     // write URL to history file after download is finished
-    writeHistory.write('\n' + favoriteURL, (error) => {
-        console.log(chalk.bgRed.white(error));
-    })
+    writeHistory.write('\n' + favoriteURL)
 
 
 };
