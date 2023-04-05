@@ -1,35 +1,35 @@
 #! /usr/bin/env node
 
-import { Command, Option } from "commander";
-import chalk from "chalk";
-import fetch from "node-fetch";
-import { readFileSync } from "fs";
-import fs from "fs";
-import { pipeline } from "stream/promises";
-import { openHistory } from "./history.js";
-import { setTimeout } from "timers/promises";
+import { Command, Option } from 'commander';
+import chalk from 'chalk';
+import fetch from 'node-fetch';
+import { readFileSync } from 'fs';
+import fs from 'fs';
+import { pipeline } from 'stream/promises';
+import { openHistory } from './history.js';
+import { setTimeout } from 'timers/promises';
 
 //fetch video info from API
 async function getVideoData(url) {
   // add the url to the query parameters
   const encodedParams = new URLSearchParams();
-  encodedParams.append("url", url);
-  encodedParams.append("hd", "1");
+  encodedParams.append('url', url);
+  encodedParams.append('hd', '1');
   // copy the options object with our API key and add the parameters as the body
   let fetchOptions = options;
   fetchOptions.body = encodedParams;
 
   // Make POST request using fetch, get JSON from response, and return the data
   const response = await fetch(
-    "https://tiktok-video-no-watermark2.p.rapidapi.com/",
+    'https://tiktok-video-no-watermark2.p.rapidapi.com/',
     fetchOptions
   );
   var responseData = await response.json();
   // Log response status, calling function will handle errors
-  if (process.env.NODE_ENV === "development") {
+  if (process.env.NODE_ENV === 'development') {
     console.log(responseData);
     console.log(
-      chalk.white("Got metadata with HTTP response " + response.status)
+      chalk.white('Got metadata with HTTP response ' + response.status)
     );
   }
   return responseData;
@@ -38,30 +38,30 @@ async function getVideoData(url) {
 //commander setup
 const program = new Command();
 program
-  .version("1.0.5")
-  .name("tikfav")
+  .version('1.0.5')
+  .name('tikfav')
   .description(
-    "Downloader utility that downloads your favorite videos from your TikTok user data file."
+    'Downloader utility that downloads your favorite videos from your TikTok user data file.'
   )
-  .option("-u <json file>", "choose user data file", "user_data.json")
-  .requiredOption("-k <key>", "your RapidAPI key")
+  .option('-u <json file>', 'choose user data file', 'user_data.json')
+  .requiredOption('-k <key>', 'your RapidAPI key')
   .parse();
 
 const opts = program.opts();
 const userDataFile = opts.u;
 var apiKey = opts.k;
 if (apiKey != undefined) {
-  console.log(chalk.green.bold("Using RapidAPI key " + apiKey));
+  console.log(chalk.green.bold('Using RapidAPI key ' + apiKey));
 }
-console.log(chalk.green("Reading from user data file " + opts.u));
+console.log(chalk.green('Reading from user data file ' + opts.u));
 
 // API HTTP request template
 const options = {
-  method: "POST",
+  method: 'POST',
   headers: {
-    "content-type": "application/x-www-form-urlencoded",
-    "X-RapidAPI-Key": apiKey,
-    "X-RapidAPI-Host": "tiktok-video-no-watermark2.p.rapidapi.com",
+    'content-type': 'application/x-www-form-urlencoded',
+    'X-RapidAPI-Key': apiKey,
+    'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com',
   },
 };
 
@@ -74,7 +74,7 @@ try {
 }
 try {
   const info = JSON.parse(data);
-  var list = info["Activity"]["Favorite Videos"]["FavoriteVideoList"];
+  var list = info['Activity']['Favorite Videos']['FavoriteVideoList'];
 } catch (error) {
   program.error(
     chalk.red(
@@ -87,7 +87,7 @@ try {
 let history = await openHistory();
 
 // Create download folder if it doesn't exist
-let dlFolder = "./tiktok-downloads/favorites";
+let dlFolder = './tiktok-downloads/favorites';
 try {
   if (!fs.existsSync(dlFolder)) {
     fs.mkdirSync(dlFolder, { recursive: true }, (err) => {
@@ -108,7 +108,7 @@ try {
 }); */
 
 // open writeStream for history file
-var writeHistory = fs.createWriteStream("history.txt", { flags: "a" });
+var writeHistory = fs.createWriteStream('history.txt', { flags: 'a' });
 //count successfully downloaded videos
 let DLCount = 0;
 
@@ -119,13 +119,13 @@ for (let i = 0; i < list.length; i++) {
   let favoriteURL = video.Link;
   // replace colons in date field for Windows filename compatability
   let og_Date = video.Date;
-  let vidDate = og_Date.replace(/:/g, "");
+  let vidDate = og_Date.replace(/:/g, '');
   if (history.indexOf(favoriteURL) != -1) {
-    console.log(chalk.magenta("Video was found in history file, skipping."));
+    console.log(chalk.magenta('Video was found in history file, skipping.'));
     continue;
   }
 
-  console.log(chalk.green("Getting video metadata for: " + favoriteURL));
+  console.log(chalk.green('Getting video metadata for: ' + favoriteURL));
 
   // get the video information from API and check for errors.
   // if the tiktok has been deleted, or there's another issue with the URL, it's logged and skipped
@@ -140,7 +140,7 @@ for (let i = 0; i < list.length; i++) {
       );
     } else {
       console.log(
-        chalk.red("Error getting video metadata for URL " + favoriteURL)
+        chalk.red('Error getting video metadata for URL ' + favoriteURL)
       );
     }
     continue;
@@ -159,7 +159,7 @@ for (let i = 0; i < list.length; i++) {
   let filename = `${dlFolder}/${vidDate}_${author}_${createTime}.mp4`;
   let file = fs.createWriteStream(filename);
   //write the response body to a file
-  file.on("finish", () => {
+  file.on('finish', () => {
     console.log(chalk.greenBright(`Finished downloading video ` + favoriteURL));
     file.close();
   });
@@ -167,8 +167,8 @@ for (let i = 0; i < list.length; i++) {
   await pipeline(videoFile.body, file);
 
   // write URL to history file after download is finished
-  writeHistory.write("\n" + favoriteURL);
+  writeHistory.write('\n' + favoriteURL);
   DLCount++;
 }
 
-console.log(chalk.greenBright("Saved " + DLCount + " videos. Goodbye."));
+console.log(chalk.greenBright('Saved ' + DLCount + ' videos. Goodbye.'));
