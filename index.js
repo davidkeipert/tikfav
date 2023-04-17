@@ -9,6 +9,7 @@ import { pipeline } from 'stream/promises';
 import { openHistory } from './history.js';
 import { setTimeout } from 'timers/promises';
 
+//MOVED
 //fetch video info from API
 async function getVideoData(url) {
   // add the url to the query parameters
@@ -34,6 +35,7 @@ async function getVideoData(url) {
   }
   return responseData;
 }
+//END MOVED
 
 //commander setup
 const program = new Command();
@@ -55,6 +57,7 @@ if (apiKey != undefined) {
 }
 console.log(chalk.green('Reading from user data file ' + opts.u));
 
+//MOVED
 // API HTTP request template
 const options = {
   method: 'POST',
@@ -64,6 +67,7 @@ const options = {
     'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com',
   },
 };
+//END MOVED
 
 //read and parse user data file JSON and gets the list of Favorite Videos
 try {
