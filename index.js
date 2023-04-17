@@ -83,92 +83,93 @@ try {
   );
 }
 
-// openHistory returns an array of strings containing all the URL's in the history file
-let history = await openHistory();
+await downloader(list, "favorites");
 
-// Create download folder if it doesn't exist
-let dlFolder = './tiktok-downloads/favorites';
-try {
-  if (!fs.existsSync(dlFolder)) {
-    fs.mkdirSync(dlFolder, { recursive: true }, (err) => {
-      if (err) throw err;
-    });
-  }
-} catch (error) {
-  console.log(error);
-  program.error(
-    "Couldn't create download directories. Please make sure you have permission to write to this folder."
-  );
-}
+async function downloader(list, category) {
+  // openHistory returns an array of strings containing all the URL's in the history file
+  let history = await openHistory();
 
-/* list.forEach(async vid => {
-
-
-
-}); */
-
-// open writeStream for history file
-var writeHistory = fs.createWriteStream('history.txt', { flags: 'a' });
-//count successfully downloaded videos
-let DLCount = 0;
-
-for (let i = 0; i < list.length; i++) {
-  let qLength = list.length;
-  let video = list[i];
-  //get data from an entry in the Favorites list
-  let favoriteURL = video.Link;
-  // replace colons in date field for Windows filename compatability
-  let og_Date = video.Date;
-  let vidDate = og_Date.replace(/:/g, '');
-  if (history.indexOf(favoriteURL) != -1) {
-    console.log(chalk.magenta('Video was found in history file, skipping.'));
-    continue;
-  }
-
-  console.log(chalk.green('Getting video metadata for: ' + favoriteURL));
-
-  // get the video information from API and check for errors.
-  // if the tiktok has been deleted, or there's another issue with the URL, it's logged and skipped
-  var responseData = await getVideoData(favoriteURL);
-  // very mid way to avoid API rate limits by setting a 1 sec timeout after every metadata API call
-  await setTimeout(250);
-
-  if (responseData.code != 0) {
-    if ((responseData.code = -1)) {
-      console.log(
-        chalk.red("Couldn't get data for this URL, video may be deleted")
-      );
-    } else {
-      console.log(
-        chalk.red('Error getting video metadata for URL ' + favoriteURL)
-      );
+  // Create download folder if it doesn't exist
+  let dlFolder = './tiktok-downloads/favorites';
+  try {
+    if (!fs.existsSync(dlFolder)) {
+      fs.mkdirSync(dlFolder, { recursive: true }, (err) => {
+        if (err) throw err;
+      });
     }
-    continue;
+  } catch (error) {
+    console.log(error);
+    program.error(
+      "Couldn't create download directories. Please make sure you have permission to write to this folder."
+    );
   }
-  // get the mp4 URL and metadata from the API response
-  let vidURL = responseData.data.hdplay;
-  let author = responseData.data.author.unique_id;
-  let createTime = responseData.data.create_time;
 
-  //fetch the video .MP4 from CDN
-  let videoFile = await fetch(vidURL);
+  // open writeStream for history file
+  var writeHistory = fs.createWriteStream('history.txt', { flags: 'a' });
+  //count successfully downloaded videos
+  let DLCount = 0;
 
-  //set filename and create a WriteStream
-  // ${vidDate}
+  for (let i = 0; i < list.length; i++) {
+    let qLength = list.length;
+    let video = list[i];
+    //get data from an entry in the Favorites list
+    let favoriteURL = video.Link;
+    // replace colons in date field for Windows filename compatability
+    let og_Date = video.Date;
+    let vidDate = og_Date.replace(/:/g, '');
+    if (history.indexOf(favoriteURL) != -1) {
+      console.log(chalk.magenta('Video was found in history file, skipping.'));
+      continue;
+    }
 
-  let filename = `${dlFolder}/${vidDate}_${author}_${createTime}.mp4`;
-  let file = fs.createWriteStream(filename);
-  //write the response body to a file
-  file.on('finish', () => {
-    console.log(chalk.greenBright(`Finished downloading video ` + favoriteURL));
-    file.close();
-  });
-  console.log(chalk.blue(`Downloading video ${i}/${qLength}...`));
-  await pipeline(videoFile.body, file);
+    console.log(chalk.green('Getting video metadata for: ' + favoriteURL));
 
-  // write URL to history file after download is finished
-  writeHistory.write('\n' + favoriteURL);
-  DLCount++;
+    // get the video information from API and check for errors.
+    // if the tiktok has been deleted, or there's another issue with the URL, it's logged and skipped
+    var responseData = await getVideoData(favoriteURL);
+    // very mid way to avoid API rate limits by setting a 1 sec timeout after every metadata API call
+    await setTimeout(250);
+
+    if (responseData.code != 0) {
+      if ((responseData.code = -1)) {
+        console.log(
+          chalk.red("Couldn't get data for this URL, video may be deleted")
+        );
+      } else {
+        console.log(
+          chalk.red('Error getting video metadata for URL ' + favoriteURL)
+        );
+      }
+      continue;
+    }
+    // get the mp4 URL and metadata from the API response
+    let vidURL = responseData.data.hdplay;
+    let author = responseData.data.author.unique_id;
+    let createTime = responseData.data.create_time;
+
+    //fetch the video .MP4 from CDN
+    let videoFile = await fetch(vidURL);
+
+    //set filename and create a WriteStream
+    // ${vidDate}
+
+    let filename = `${dlFolder}/${vidDate}_${author}_${createTime}.mp4`;
+    let file = fs.createWriteStream(filename);
+    //write the response body to a file
+    file.on('finish', () => {
+      console.log(chalk.greenBright(`Finished downloading video ` + favoriteURL));
+      file.close();
+    });
+    console.log(chalk.blue(`Downloading video ${i}/${qLength}...`));
+    await pipeline(videoFile.body, file);
+
+    // write URL to history file after download is finished
+    writeHistory.write('\n' + favoriteURL);
+    DLCount++;
+  }
+
+  console.log(chalk.greenBright('Saved ' + DLCount + ' videos. Goodbye.'));
+
+
 }
 
-console.log(chalk.greenBright('Saved ' + DLCount + ' videos. Goodbye.'));
