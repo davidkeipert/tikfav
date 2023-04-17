@@ -1,3 +1,6 @@
+import chalk from 'chalk';
+import fetch from 'node-fetch';
+
 //fetch video info from API
 export async function getVideoData(url, apiKey) {
     const options = {
@@ -22,7 +25,12 @@ export async function getVideoData(url, apiKey) {
         'https://tiktok-video-no-watermark2.p.rapidapi.com/',
         fetchOptions
     );
-    var responseData = await response.json();
+    try {
+        var responseData = await response.json();
+    } catch (error) {
+        console.error('fetch error')
+    }
+
     // Log response status, calling function will handle errors
     if (process.env.NODE_ENV === 'development') {
         console.log(responseData);

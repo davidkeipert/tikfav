@@ -8,34 +8,7 @@ import fs from 'fs';
 import { pipeline } from 'stream/promises';
 import { openHistory } from './history.js';
 import { setTimeout } from 'timers/promises';
-
-//MOVED
-//fetch video info from API
-async function getVideoData(url) {
-  // add the url to the query parameters
-  const encodedParams = new URLSearchParams();
-  encodedParams.append('url', url);
-  encodedParams.append('hd', '1');
-  // copy the options object with our API key and add the parameters as the body
-  let fetchOptions = options;
-  fetchOptions.body = encodedParams;
-
-  // Make POST request using fetch, get JSON from response, and return the data
-  const response = await fetch(
-    'https://tiktok-video-no-watermark2.p.rapidapi.com/',
-    fetchOptions
-  );
-  var responseData = await response.json();
-  // Log response status, calling function will handle errors
-  if (process.env.NODE_ENV === 'development') {
-    console.log(responseData);
-    console.log(
-      chalk.white('Got metadata with HTTP response ' + response.status)
-    );
-  }
-  return responseData;
-}
-//END MOVED
+import { getVideoData } from './videoInfo.js';
 
 //commander setup
 const program = new Command();
@@ -47,54 +20,79 @@ program
   )
   .option('-u <json file>', 'choose user data file', 'user_data.json')
   .requiredOption('-k <key>', 'your RapidAPI key')
-  .parse();
 
-const opts = program.opts();
-const userDataFile = opts.u;
-var apiKey = opts.k;
-if (apiKey != undefined) {
-  console.log(chalk.green.bold('Using RapidAPI key ' + apiKey));
+program.command('favorites')
+  .description('download your favorite videos')
+  .action(async () => {
+    try {
+      await getVideos("favorites")
+    } catch (error) {
+      console.error('getVideo failed', error)
+    }
+
+  })
+
+program.command('liked')
+  .description('download your liked videos')
+  .action(async () => {
+    try {
+      await getVideos("liked")
+    } catch (error) {
+      console.error('getVideo failed', error)
+    }
+
+  })
+
+program.parse(process.argv);
+
+
+async function getVideos(category) {
+  // Initialize variables from CLI args
+  const opts = program.opts();
+  const userDataFile = opts.u;
+  var apiKey = opts.k;
+  if (apiKey != undefined) {
+    console.log(chalk.green.bold('Using RapidAPI key ' + apiKey));
+  }
+  console.log(chalk.green('Reading from user data file ' + opts.u));
+
+  //read and parse user data file JSON and gets the list of Favorite Videos
+  try {
+    var data = readFileSync(`./${userDataFile}`);
+  } catch (error) {
+    //console.log("Error reading userdata file:", error);
+    program.error(chalk.red("Couldn't read user data file, does it exist?"));
+  }
+  try {
+    const info = JSON.parse(data);
+
+    if (category === 'favorites') {
+      var list = info['Activity']['Favorite Videos']['FavoriteVideoList'];
+    } else if (category === 'liked') {
+      var list = info['Activity']['Like List']['ItemFavoriteList'];
+    }
+
+
+  } catch (error) {
+    program.error(
+      chalk.red(
+        "Couldn't parse JSON data. Make sure you have chosen an unmodified TikTok data JSON file."
+      )
+    );
+  }
+  //call the downloader function with the list of videos we want to download
+  await downloader(list, category, apiKey);
 }
-console.log(chalk.green('Reading from user data file ' + opts.u));
 
-//MOVED
-// API HTTP request template
-const options = {
-  method: 'POST',
-  headers: {
-    'content-type': 'application/x-www-form-urlencoded',
-    'X-RapidAPI-Key': apiKey,
-    'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com',
-  },
-};
-//END MOVED
 
-//read and parse user data file JSON and gets the list of Favorite Videos
-try {
-  var data = readFileSync(`./${userDataFile}`);
-} catch (error) {
-  //console.log("Error reading userdata file:", error);
-  program.error(chalk.red("Couldn't read user data file, does it exist?"));
-}
-try {
-  const info = JSON.parse(data);
-  var list = info['Activity']['Favorite Videos']['FavoriteVideoList'];
-} catch (error) {
-  program.error(
-    chalk.red(
-      "Couldn't parse JSON data. Make sure you have chosen an unmodified TikTok data JSON file."
-    )
-  );
-}
 
-await downloader(list, "favorites");
 
-async function downloader(list, category) {
+async function downloader(list, category, apiKey) {
   // openHistory returns an array of strings containing all the URL's in the history file
   let history = await openHistory();
 
   // Create download folder if it doesn't exist
-  let dlFolder = './tiktok-downloads/favorites';
+  let dlFolder = './tiktok-downloads/' + category;
   try {
     if (!fs.existsSync(dlFolder)) {
       fs.mkdirSync(dlFolder, { recursive: true }, (err) => {
@@ -130,7 +128,7 @@ async function downloader(list, category) {
 
     // get the video information from API and check for errors.
     // if the tiktok has been deleted, or there's another issue with the URL, it's logged and skipped
-    var responseData = await getVideoData(favoriteURL);
+    var responseData = await getVideoData(favoriteURL, apiKey);
     // very mid way to avoid API rate limits by setting a 1 sec timeout after every metadata API call
     await setTimeout(250);
 
