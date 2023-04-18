@@ -37,3 +37,5 @@ Videos are downloaded to a subfolder called `tiktok-downloads` in whichever dire
 - [x] add option to download liked videos instead of favorites
 - [ ] download Tiktok sounds and videos from your share history
 
+# Known Issues
+- slow downloads and high RAM usage when running on WSL
