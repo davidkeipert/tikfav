@@ -151,6 +151,7 @@ async function downloader(list, category, apiKey) {
     let vidURL = responseData.data.hdplay;
     let author = responseData.data.author.unique_id;
     let createTime = responseData.data.create_time;
+    let videoID = responseData.data.id;
 
     //fetch the video .MP4 from CDN
     let videoFile = await fetch(vidURL);
@@ -158,7 +159,7 @@ async function downloader(list, category, apiKey) {
     //set filename and create a WriteStream
     // ${vidDate}
 
-    let filename = `${dlFolder}/${vidDate}_${author}_${createTime}.mp4`;
+    let filename = `${dlFolder}/${vidDate}_${author}_${videoID}.mp4`;
     let file = fs.createWriteStream(filename);
     //write the response body to a file
     file.on('finish', () => {
