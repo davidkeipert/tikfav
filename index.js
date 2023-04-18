@@ -9,11 +9,14 @@ import { pipeline } from 'stream/promises';
 import { openHistory } from './history.js';
 import { setTimeout } from 'timers/promises';
 import { getVideoData } from './videoInfo.js';
+import packageInfo from './package.json' assert { type: 'json' };
 
+//get version info from package.json
+const version = packageInfo.version
 //commander setup
 const program = new Command();
 program
-  .version('1.0.5')
+  .version(version)
   .name('tikfav')
   .description(
     'Downloader utility that downloads your favorite videos from your TikTok user data file.'
