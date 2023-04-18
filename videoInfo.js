@@ -16,7 +16,6 @@ export async function getVideoData(url, apiKey) {
     const encodedParams = new URLSearchParams();
     encodedParams.append('url', url);
     encodedParams.append('hd', '1');
-    console.log(encodedParams)
     // copy the options object with our API key and add the parameters as the body
     let fetchOptions = options;
     fetchOptions.body = encodedParams;
@@ -54,6 +53,11 @@ export async function getSoundData(url, apiKey) {
 
     let searchURL = 'https://tiktok-video-no-watermark2.p.rapidapi.com/music/info?url=' + url;
     const response = await fetch(searchURL, options);
+    try {
+        var responseData = await response.json();
+    } catch (error) {
+        console.error("Couldn't parse response data")
+    }
 
     try {
         console.log(responseData);

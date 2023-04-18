@@ -8,8 +8,9 @@ import fs from 'fs';
 import { pipeline } from 'stream/promises';
 import { openHistory } from './history.js';
 import { setTimeout } from 'timers/promises';
-import { getVideoData } from './videoInfo.js';
+import { getVideoData, getSoundData } from './videoInfo.js';
 import packageInfo from './package.json' assert { type: 'json' };
+import { downloadSounds } from './downloadSounds.js';
 
 //get version info from package.json
 const version = packageInfo.version
@@ -28,7 +29,10 @@ program.command('favorites')
   .description('download your favorite videos')
   .action(async () => {
     try {
-      await getVideos("favorites")
+      const task = await readData("favorites");
+      let list = task[0];
+      let apiKey = task[2];
+      await downloader(list, "favorites", apiKey)
     } catch (error) {
       console.error('getVideo failed', error)
     }
@@ -39,17 +43,29 @@ program.command('liked')
   .description('download your liked videos')
   .action(async () => {
     try {
-      await getVideos("liked")
+      const task = await readData("liked")
+      let list = task[0]
+      let apiKey = task[2]
+      await downloader(list, "liked", apiKey);
     } catch (error) {
       console.error('getVideo failed', error)
     }
 
   })
 
+program.command('sounds')
+  .description('download your favorite sounds')
+  .action(async () => {
+    const task = await readData("sounds")
+    let list = task[0];
+    let apiKey = task[2];
+    console.log('read favorite sounds data')
+    await downloadSounds(list, apiKey);
+  })
 program.parse(process.argv);
 
 
-async function getVideos(category) {
+async function readData(category) {
   // Initialize variables from CLI args
   const opts = program.opts();
   const userDataFile = opts.u;
@@ -73,6 +89,8 @@ async function getVideos(category) {
       var list = info['Activity']['Favorite Videos']['FavoriteVideoList'];
     } else if (category === 'liked') {
       var list = info['Activity']['Like List']['ItemFavoriteList'];
+    } else if (category === 'sounds') {
+      var list = info['Activity']['Favorite Sounds']['FavoriteSoundList']
     }
 
 
@@ -83,12 +101,9 @@ async function getVideos(category) {
       )
     );
   }
-  //call the downloader function with the list of videos we want to download
-  await downloader(list, category, apiKey);
+
+  return [list, category, apiKey];
 }
-
-
-
 
 async function downloader(list, category, apiKey) {
   // openHistory returns an array of strings containing all the URL's in the history file
