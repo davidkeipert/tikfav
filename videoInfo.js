@@ -16,6 +16,7 @@ export async function getVideoData(url, apiKey) {
     const encodedParams = new URLSearchParams();
     encodedParams.append('url', url);
     encodedParams.append('hd', '1');
+    console.log(encodedParams)
     // copy the options object with our API key and add the parameters as the body
     let fetchOptions = options;
     fetchOptions.body = encodedParams;
@@ -39,4 +40,35 @@ export async function getVideoData(url, apiKey) {
         );
     }
     return responseData;
+}
+
+//fetch sound info from API
+export async function getSoundData(url, apiKey) {
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': apiKey,
+            'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com',
+        },
+    };
+
+    let searchURL = 'https://tiktok-video-no-watermark2.p.rapidapi.com/music/info?url=' + url;
+    const response = await fetch(searchURL, options);
+
+    try {
+        console.log(responseData);
+    } catch (error) {
+        console.error("Couldn't get sound metadata")
+    }
+
+    // Log response status
+    if (process.env.NODE_ENV === 'development') {
+        console.log(responseData);
+        console.log(
+            chalk.white('Got metadata with HTTP response ' + response.status)
+        );
+    }
+
+    return responseData;
+
 }
