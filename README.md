@@ -18,7 +18,11 @@ You'll need to set this key to the app with the -k option at runtime.
 `npm install -g tikfav`
 
 # Usage  
-Run `tikfav`. It will look for a data file called user_data.json by default. If yours has a different name, or resides in a different directroy, specify the path with the `-u` option.
+Run `tikfav` followed by the command you want to run. It will look for a data file called `user_data.json` by default. If yours has a different name, or resides in a different directroy, specify the path with the `-u` option. You also need to give it your RapidAPI key with the `-k` option. See above for instructions about the API.
+
+### Commands
+`favorites` download the videos in your Favorites list
+`liked` download the videos in your Liked list
 
 ### Options
 `-k` your RapidAPI key, REQUIRED  
@@ -30,4 +34,6 @@ Videos are downloaded to a subfolder called `tiktok-downloads` in whichever dire
 
 # Upcoming Features
 
-- [ ] add option to download liked videos instead of favorites
+- [x] add option to download liked videos instead of favorites
+- [ ] download Tiktok sounds and videos from your share history
+
