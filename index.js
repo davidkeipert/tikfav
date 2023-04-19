@@ -56,12 +56,24 @@ program.command('liked')
 program.command('sounds')
   .description('download your favorite sounds')
   .action(async () => {
-    const task = await readData("sounds")
+    const task = await readData("sounds");
     let list = task[0];
     let apiKey = task[2];
     console.log('read favorite sounds data')
     await downloadSounds(list, apiKey);
   })
+
+program.command('shared')
+  .description('download videos you shared')
+  .action(async () => {
+    const task = await readData("shared");
+    console.log('read shared video data');
+    await downloader(task[0], "shared", task[2]);
+  })
+
+
+
+
 program.parse(process.argv);
 
 
@@ -91,6 +103,11 @@ async function readData(category) {
       var list = info['Activity']['Like List']['ItemFavoriteList'];
     } else if (category === 'sounds') {
       var list = info['Activity']['Favorite Sounds']['FavoriteSoundList']
+    } else if (category === 'shared') {
+      var rawList = info['Activity']['Share History']['ShareHistoryList']
+      var list = rawList.filter((value, index, array) => {
+        return value.SharedContent == 'video';
+      });
     }
 
 
@@ -193,4 +210,5 @@ async function downloader(list, category, apiKey) {
 
 
 }
+
 

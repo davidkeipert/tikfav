@@ -12,7 +12,7 @@ To use this tool you'll need to download your user data from Tiktok by going to 
 ### Video Download API Key
 
 Sign up for either a free or paid plan here: https://rapidapi.com/yi005/api/tiktok-video-no-watermark2  
-You'll need to set this key to the app with the -k option at runtime.
+You'll need to pass this key to the app with the -k option at runtime.
 
 # Installation  
 `npm install -g tikfav`
@@ -23,6 +23,7 @@ Run `tikfav` followed by the command you want to run. It will look for a data fi
 ### Commands
 `favorites` download the videos in your Favorites list
 `liked` download the videos in your Liked list
+`shared` download videos you shared
 
 ### Options
 `-k` your RapidAPI key, REQUIRED  
