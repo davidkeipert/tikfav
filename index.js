@@ -13,7 +13,7 @@ import packageInfo from './package.json' assert { type: 'json' };
 import { downloadSounds } from './downloadSounds.js';
 
 //get version info from package.json
-const version = packageInfo.version
+const version = packageInfo.version;
 //commander setup
 const program = new Command();
 program
@@ -23,59 +23,57 @@ program
     'Downloader utility that downloads your favorite videos from your TikTok user data file.'
   )
   .option('-u <json file>', 'choose user data file', 'user_data.json')
-  .requiredOption('-k <key>', 'your RapidAPI key')
+  .requiredOption('-k <key>', 'your RapidAPI key');
 
-program.command('favorites')
+program
+  .command('favorites')
   .description('download your favorite videos')
   .action(async () => {
     try {
-      const task = await readData("favorites");
+      const task = await readData('favorites');
       let list = task[0];
       let apiKey = task[2];
-      await downloader(list, "favorites", apiKey)
+      await downloader(list, 'favorites', apiKey);
     } catch (error) {
-      console.error('getVideo failed', error)
+      console.error('getVideo failed', error);
     }
+  });
 
-  })
-
-program.command('liked')
+program
+  .command('liked')
   .description('download your liked videos')
   .action(async () => {
     try {
-      const task = await readData("liked")
-      let list = task[0]
-      let apiKey = task[2]
-      await downloader(list, "liked", apiKey);
+      const task = await readData('liked');
+      let list = task[0];
+      let apiKey = task[2];
+      await downloader(list, 'liked', apiKey);
     } catch (error) {
-      console.error('getVideo failed', error)
+      console.error('getVideo failed', error);
     }
+  });
 
-  })
-
-program.command('sounds')
+program
+  .command('sounds')
   .description('download your favorite sounds')
   .action(async () => {
-    const task = await readData("sounds");
+    const task = await readData('sounds');
     let list = task[0];
     let apiKey = task[2];
-    console.log('read favorite sounds data')
+    console.log('read favorite sounds data');
     await downloadSounds(list, apiKey);
-  })
+  });
 
-program.command('shared')
+program
+  .command('shared')
   .description('download videos you shared')
   .action(async () => {
-    const task = await readData("shared");
+    const task = await readData('shared');
     console.log('read shared video data');
-    await downloader(task[0], "shared", task[2]);
-  })
-
-
-
+    await downloader(task[0], 'shared', task[2]);
+  });
 
 program.parse(process.argv);
-
 
 async function readData(category) {
   // Initialize variables from CLI args
@@ -102,15 +100,13 @@ async function readData(category) {
     } else if (category === 'liked') {
       var list = info['Activity']['Like List']['ItemFavoriteList'];
     } else if (category === 'sounds') {
-      var list = info['Activity']['Favorite Sounds']['FavoriteSoundList']
+      var list = info['Activity']['Favorite Sounds']['FavoriteSoundList'];
     } else if (category === 'shared') {
-      var rawList = info['Activity']['Share History']['ShareHistoryList']
+      var rawList = info['Activity']['Share History']['ShareHistoryList'];
       var list = rawList.filter((value, index, array) => {
         return value.SharedContent == 'video';
       });
     }
-
-
   } catch (error) {
     program.error(
       chalk.red(
@@ -195,7 +191,9 @@ async function downloader(list, category, apiKey) {
     let file = fs.createWriteStream(filename);
     //write the response body to a file
     file.on('finish', () => {
-      console.log(chalk.greenBright(`Finished downloading video ` + favoriteURL));
+      console.log(
+        chalk.greenBright(`Finished downloading video ` + favoriteURL)
+      );
       file.close();
     });
     console.log(chalk.blue(`Downloading video ${i}/${qLength}...`));
@@ -207,8 +205,4 @@ async function downloader(list, category, apiKey) {
   }
 
   console.log(chalk.greenBright('Saved ' + DLCount + ' videos. Goodbye.'));
-
-
 }
-
-
