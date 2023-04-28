@@ -40,3 +40,33 @@ export async function getVideoData(url, apiKey) {
     }
     return responseData;
 }
+
+//fetch sound info from API
+export async function getSoundData(url, apiKey) {
+    const options = {
+        method: 'GET',
+        headers: {
+            'X-RapidAPI-Key': apiKey,
+            'X-RapidAPI-Host': 'tiktok-video-no-watermark2.p.rapidapi.com',
+        },
+    };
+
+    let searchURL = 'https://tiktok-video-no-watermark2.p.rapidapi.com/music/info?url=' + url;
+    const response = await fetch(searchURL, options);
+    try {
+        var responseData = await response.json();
+    } catch (error) {
+        console.error("Couldn't parse response data")
+    }
+
+    // Log response status
+    if (process.env.NODE_ENV === 'development') {
+        console.log(responseData);
+        console.log(
+            chalk.white('Got metadata with HTTP response ' + response.status)
+        );
+    }
+
+    return responseData;
+
+}
