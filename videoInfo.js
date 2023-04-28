@@ -59,12 +59,6 @@ export async function getSoundData(url, apiKey) {
         console.error("Couldn't parse response data")
     }
 
-    try {
-        console.log(responseData);
-    } catch (error) {
-        console.error("Couldn't get sound metadata")
-    }
-
     // Log response status
     if (process.env.NODE_ENV === 'development') {
         console.log(responseData);
