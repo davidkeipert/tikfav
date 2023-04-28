@@ -80,7 +80,7 @@ export async function downloadSounds(list, apiKey) {
         console.log(chalk.blue(`Downloading sound ${i}/${qLength}...`));
         await pipeline(soundFile.body, file);
 
-        writeHistory.write('\n' + soundMP3);
+        writeHistory.write('\n' + soundURL);
         DLCount++;
 
     }
