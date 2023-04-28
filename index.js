@@ -60,7 +60,7 @@ program
     const task = await readData('sounds');
     let list = task[0];
     let apiKey = task[2];
-    console.log('read favorite sounds data');
+    console.log(chalk.blue('Success: Read favorite sounds list.'));
     await downloadSounds(list, apiKey);
   });
 
@@ -69,16 +69,16 @@ program
   .description('download videos you shared')
   .action(async () => {
     const task = await readData('shared');
-    console.log('read shared video data');
+    console.log(chalk.blue('Success: Read shared videos list.'));
     await downloader(task[0], 'shared', task[2]);
   });
 
 program
   .command('history')
-  .description('download your browsing history')
+  .description('download video browsing history')
   .action(async () => {
     const task = await readData('history');
-    console.log('read browsing history data');
+    console.log(chalk.blue('Success: Read browsing history list.'));
     await downloader(task[0], 'history', task[2]);
   });
 
