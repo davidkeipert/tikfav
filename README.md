@@ -19,14 +19,15 @@ You'll need to pass this key to the app with the -k option at runtime.
 
 # Usage  
 `tikfav -k xxxxxxxxxxxxx -u user_data.json favorites`  
+
 Run `tikfav` followed by the command you want to run. It will look for a data file called `user_data.json` by default. If yours has a different name, or resides in a different directroy, specify the path with the `-u` option. You also need to give it your RapidAPI key with the `-k` option. See above for instructions about the API.
 
 ### Commands
-`favorites` download the videos in your Favorites list
-`liked` download the videos in your Liked list
-`sounds` download the sounds in your Favorites list
-`shared` download videos you shared
-`history` download videos from your browsing history
+`favorites` download the videos in your Favorites list  
+`liked` download the videos in your Liked list  
+`sounds` download the sounds in your Favorites list  
+`shared` download videos you shared  
+`history` download videos from your browsing history  
 
 ### Options
 `-k` your RapidAPI key, REQUIRED  
