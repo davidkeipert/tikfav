@@ -73,6 +73,15 @@ program
     await downloader(task[0], 'shared', task[2]);
   });
 
+program
+  .command('history')
+  .description('download your browsing history')
+  .action(async () => {
+    const task = await readData('history');
+    console.log('read browsing history data');
+    await downloader(task[0], 'history', task[2]);
+  });
+
 program.parse(process.argv);
 
 async function readData(category) {
@@ -106,6 +115,8 @@ async function readData(category) {
       var list = rawList.filter((value, index, array) => {
         return value.SharedContent == 'video';
       });
+    } else if (category === 'history') {
+      var list = info['Activity']['Video Browsing History']['VideoList'];
     }
   } catch (error) {
     program.error(
