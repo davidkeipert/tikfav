@@ -43,14 +43,10 @@ program
   .command('liked')
   .description('download your liked videos')
   .action(async () => {
-    try {
-      const task = await readData('liked');
-      let list = task[0];
-      let apiKey = task[2];
-      await downloader(list, 'liked', apiKey);
-    } catch (error) {
-      console.error('getVideo failed', error);
-    }
+    const task = await readData('liked');
+    let list = task[0];
+    let apiKey = task[2];
+    await downloader(list, 'liked', apiKey);
   });
 
 program
@@ -192,23 +188,34 @@ async function downloader(list, category, apiKey) {
     let createTime = responseData.data.create_time;
     let videoID = responseData.data.id;
 
-    //fetch the video .MP4 from CDN
-    let videoFile = await fetch(vidURL);
+    let videoFile;
+    try {
+      //fetch the video .MP4 from CDN
+      videoFile = await fetch(vidURL);
+    } catch (error) {
+      console.log(chalk.redBright('Error downloading video:'));
+      console.log(chalk.red(error));
+      continue;
+    }
 
-    //set filename and create a WriteStream
-    // ${vidDate}
-
-    let filename = `${dlFolder}/${vidDate}_${author}_${videoID}.mp4`;
-    let file = fs.createWriteStream(filename);
-    //write the response body to a file
-    file.on('finish', () => {
-      console.log(
-        chalk.greenBright(`Finished downloading video ` + favoriteURL)
-      );
-      file.close();
-    });
-    console.log(chalk.blue(`Downloading video ${i}/${qLength}...`));
-    await pipeline(videoFile.body, file);
+    try {
+      //set filename and create a WriteStream
+      // ${vidDate}
+      let filename = `${dlFolder}/${vidDate}_${author}_${videoID}.mp4`;
+      let file = fs.createWriteStream(filename);
+      //write the response body to a file
+      file.on('finish', () => {
+        console.log(
+          chalk.greenBright(`Finished downloading video ` + favoriteURL)
+        );
+        file.close();
+      });
+      console.log(chalk.blue(`Downloading video ${i}/${qLength}...`));
+      await pipeline(videoFile.body, file);
+    } catch (error) {
+      console.log(chalk.redBright('Error writing file to disk.'));
+      console.log(error);
+    }
 
     // write URL to history file after download is finished
     writeHistory.write('\n' + favoriteURL);
