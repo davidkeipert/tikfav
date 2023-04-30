@@ -6,7 +6,5 @@ export function cleanFileName(filename) {
     remove: /[/\\?%*:|"<>]/g,
     locale: 'en',
   });
-
-  console.log(chalk.bgMagentaBright('fixed filename: ' + fixed));
   return fixed;
 }

@@ -11,6 +11,7 @@ import { setTimeout } from 'timers/promises';
 import { getVideoData, getSoundData } from './videoInfo.js';
 import packageInfo from './package.json' assert { type: 'json' };
 import { downloadSounds } from './downloadSounds.js';
+import { cleanFileName } from './utils.js';
 
 //get version info from package.json
 const version = packageInfo.version;
@@ -188,7 +189,7 @@ async function downloader(list, category, apiKey) {
     }
     // get the mp4 URL and metadata from the API response
     let vidURL = responseData.data.hdplay;
-    let author = responseData.data.author.unique_id;
+    let author = cleanFileName(responseData.data.author.unique_id);
     let createTime = responseData.data.create_time;
     let videoID = responseData.data.id;
 
