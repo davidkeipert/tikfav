@@ -67,6 +67,12 @@ export async function downloadSounds(list, apiKey) {
     let title = cleanFileName(responseData.data.title);
     let soundID = responseData.data.id;
 
+    //check for unavailable sound
+    if (!soundMP3) {
+      console.log(chalk.red('This sound is unavailable, skipping.'));
+      continue;
+    }
+
     // fetch MP3 file
     let soundFile = await fetch(soundMP3);
 
