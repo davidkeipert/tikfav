@@ -176,7 +176,7 @@ async function downloader(list, category, apiKey) {
     await setTimeout(250);
 
     if (responseData.code != 0) {
-      if ((responseData.code = -1)) {
+      if (responseData.code == -1) {
         console.log(
           chalk.red("Couldn't get data for this URL, video may be deleted")
         );
