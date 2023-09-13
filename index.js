@@ -166,7 +166,7 @@ async function downloader(list, category, apiKey) {
       console.log(chalk.magenta('Video was found in history file, skipping.'));
       continue;
     }
-
+//___METADATA FETCHING
     console.log(chalk.green('Getting video metadata for: ' + favoriteURL));
 
     // get the video information from API and check for errors.
@@ -193,9 +193,23 @@ async function downloader(list, category, apiKey) {
     let createTime = responseData.data.create_time;
     let videoID = responseData.data.id;
 
+    //___VIDEO FETCHING
     //fetch the video .MP4 from CDN
-    let videoFile = await fetch(vidURL);
-
+    let videoFile;
+    let retry = 0;
+    let success = false;
+    do {
+      try {
+        videoFile = await fetch(vidURL);
+        success = true;
+      } catch (e) {
+        console.log(chalk.red('Error downloading video'));
+      }
+    } while (retry<3 && success=== false);
+    if(success !== true){
+      console.log(chalk.red(`Video download failed with ${retry+1} retries, skipping`))
+      continue;
+    }
     //set filename and create a WriteStream
     // ${vidDate}
 
