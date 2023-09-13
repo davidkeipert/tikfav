@@ -100,7 +100,7 @@ async function readData(category) {
     var data = readFileSync(`./${userDataFile}`);
   } catch (error) {
     //console.log("Error reading userdata file:", error);
-    program.error(chalk.red("Couldn't read user data file, does it exist?"));
+    program.error(chalk.red('Couldn\'t read user data file, does it exist?'));
   }
   try {
     const info = JSON.parse(data);
@@ -122,7 +122,7 @@ async function readData(category) {
   } catch (error) {
     program.error(
       chalk.red(
-        "Couldn't parse JSON data. Make sure you have chosen an unmodified TikTok data JSON file."
+        'Couldn\'t parse JSON data. Make sure you have chosen an unmodified TikTok data JSON file.'
       )
     );
   }
@@ -145,7 +145,7 @@ async function downloader(list, category, apiKey) {
   } catch (error) {
     console.log(error);
     program.error(
-      "Couldn't create download directories. Please make sure you have permission to write to this folder."
+      'Couldn\'t create download directories. Please make sure you have permission to write to this folder.'
     );
   }
 
@@ -178,7 +178,7 @@ async function downloader(list, category, apiKey) {
     if (responseData.code != 0) {
       if (responseData.code == -1) {
         console.log(
-          chalk.red("Couldn't get data for this URL, video may be deleted")
+          chalk.red('Couldn\'t get data for this URL, video may be deleted')
         );
       } else {
         console.log(
@@ -205,9 +205,9 @@ async function downloader(list, category, apiKey) {
       } catch (e) {
         console.log(chalk.red('Error downloading video'));
       }
-    } while (retry<3 && success=== false);
-    if(success !== true){
-      console.log(chalk.red(`Video download failed with ${retry+1} retries, skipping`))
+    } while (retry < 3 && success === false);
+    if (success !== true) {
+      console.log(chalk.red(`Video download failed with ${retry + 1} retries, skipping`));
       continue;
     }
     //set filename and create a WriteStream
