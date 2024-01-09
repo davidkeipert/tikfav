@@ -193,37 +193,34 @@ async function downloader(list, category, apiKey) {
     let createTime = responseData.data.create_time;
     let videoID = responseData.data.id;
 
-    //___VIDEO FETCHING
-    //fetch the video .MP4 from CDN
     let videoFile;
-    let retry = 0;
-    let success = false;
-    do {
-      try {
-        videoFile = await fetch(vidURL);
-        success = true;
-      } catch (e) {
-        console.log(chalk.red('Error downloading video'));
-      }
-    } while (retry < 3 && success === false);
-    if (success !== true) {
-      console.log(chalk.red(`Video download failed with ${retry + 1} retries, skipping`));
+    try {
+      //fetch the video .MP4 from CDN
+      videoFile = await fetch(vidURL);
+    } catch (error) {
+      console.log(chalk.redBright('Error downloading video:'));
+      console.log(chalk.red(error));
       continue;
     }
-    //set filename and create a WriteStream
-    // ${vidDate}
 
-    let filename = `${dlFolder}/${vidDate}_${author}_${videoID}.mp4`;
-    let file = fs.createWriteStream(filename);
-    //write the response body to a file
-    file.on('finish', () => {
-      console.log(
-        chalk.greenBright(`Finished downloading video ` + favoriteURL)
-      );
-      file.close();
-    });
-    console.log(chalk.blue(`Downloading video ${i}/${qLength}...`));
-    await pipeline(videoFile.body, file);
+    try {
+      //set filename and create a WriteStream
+      // ${vidDate}
+      let filename = `${dlFolder}/${vidDate}_${author}_${videoID}.mp4`;
+      let file = fs.createWriteStream(filename);
+      //write the response body to a file
+      file.on('finish', () => {
+        console.log(
+          chalk.greenBright(`Finished downloading video ` + favoriteURL)
+        );
+        file.close();
+      });
+      console.log(chalk.blue(`Downloading video ${i}/${qLength}...`));
+      await pipeline(videoFile.body, file);
+    } catch (error) {
+      console.log(chalk.redBright('Error writing file to disk.'));
+      console.log(error);
+    }
 
     // write URL to history file after download is finished
     writeHistory.write('\n' + favoriteURL);
