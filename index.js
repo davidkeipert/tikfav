@@ -83,6 +83,19 @@ program
     await downloader(task[0], 'history', task[2]);
   });
 
+program.command('messages')
+  .description('download shared videos from dms')
+  .action(async () => {
+    const task = await readData('messages');
+    console.log(chalk.blue('Success: Read DM history list.'));
+    for (const chat of task[0]) {
+      let user = chat[0]['user'];
+      console.log('history for user ' + user);
+      await downloader(chat, 'messages', task[2], user);
+    }
+
+  });
+
 program.parse(process.argv);
 
 async function readData(category) {
@@ -104,22 +117,32 @@ async function readData(category) {
   }
   try {
     const info = JSON.parse(data);
-
+    var list = [];
     if (category === 'favorites') {
-      var list = info['Activity']['Favorite Videos']['FavoriteVideoList'];
+      list = info['Activity']['Favorite Videos']['FavoriteVideoList'];
     } else if (category === 'liked') {
-      var list = info['Activity']['Like List']['ItemFavoriteList'];
+      list = info['Activity']['Like List']['ItemFavoriteList'];
     } else if (category === 'sounds') {
-      var list = info['Activity']['Favorite Sounds']['FavoriteSoundList'];
+      list = info['Activity']['Favorite Sounds']['FavoriteSoundList'];
     } else if (category === 'shared') {
-      var rawList = info['Activity']['Share History']['ShareHistoryList'];
-      var list = rawList.filter((value, index, array) => {
+      let rawList = info['Activity']['Share History']['ShareHistoryList'];
+      list = rawList.filter((value, index, array) => {
         return value.SharedContent == 'video';
       });
     } else if (category === 'history') {
-      var list = info['Activity']['Video Browsing History']['VideoList'];
+      list = info['Activity']['Video Browsing History']['VideoList'];
+    } else if (category === 'messages') {
+      //get list of chat history, append each item from each chat to LIST and make sure it specifies the folder to save to
+      let messages = info['Direct Messages']['Chat History']['ChatHistory'];
+      Object.keys(messages).forEach(value => {
+        let chat = messages[value];
+        chat[0].user = value.split(/\s+/).pop();
+        list.push(chat);
+      });
     }
+
   } catch (error) {
+    console.log(error);
     program.error(
       chalk.red(
         'Couldn\'t parse JSON data. Make sure you have chosen an unmodified TikTok data JSON file.'
@@ -130,12 +153,15 @@ async function readData(category) {
   return [list, category, apiKey];
 }
 
-async function downloader(list, category, apiKey) {
+async function downloader(list, category, apiKey, subFolder = '') {
   // openHistory returns an array of strings containing all the URL's in the history file
   let history = await openHistory();
 
   // Create download folder if it doesn't exist
   let dlFolder = './tiktok-downloads/' + category;
+  if (subFolder.length > 0) {
+    dlFolder += '/' + subFolder;
+  }
   try {
     if (!fs.existsSync(dlFolder)) {
       fs.mkdirSync(dlFolder, { recursive: true }, (err) => {
@@ -154,14 +180,28 @@ async function downloader(list, category, apiKey) {
   //count successfully downloaded videos
   let DLCount = 0;
 
+
   for (let i = 0; i < list.length; i++) {
+    //set the property names for the video items in the list bc dm lists have a different naming scheme
+    let link = '';
+    let date = 'Date';
+    if (category === 'messages') {
+      link = 'Content';
+    } else {
+      link = 'Link';
+    }
+
     let qLength = list.length;
     let video = list[i];
     //get data from an entry in the Favorites list
-    let favoriteURL = video.Link;
+    let favoriteURL = video[link];
     // replace colons in date field for Windows filename compatability
-    let og_Date = video.Date;
+    let og_Date = video[date];
     let vidDate = og_Date.replace(/:/g, '');
+    //check if url contains valid tiktok url
+    if (!favoriteURL.startsWith('https://')) {
+      continue;
+    }
     if (history.indexOf(favoriteURL) != -1) {
       console.log(chalk.magenta('Video was found in history file, skipping.'));
       continue;
