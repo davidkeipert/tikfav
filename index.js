@@ -12,7 +12,9 @@ import { getVideoData, getSoundData } from './videoInfo.js';
 import packageInfo from './package.json' assert { type: 'json' };
 import { downloadSounds } from './downloadSounds.js';
 import { cleanFileName } from './utils.js';
-
+import 'dotenv/config';
+import { downloadSlideshow } from './downloadSlideshow.js';
+import { downloadVideo } from './downloadVideo.js';
 //get version info from package.json
 const version = packageInfo.version;
 //commander setup
@@ -227,44 +229,28 @@ async function downloader(list, category, apiKey, subFolder = '') {
       }
       continue;
     }
-    // get the mp4 URL and metadata from the API response
-    let vidURL = responseData.data.hdplay;
-    let author = cleanFileName(responseData.data.author.unique_id);
-    let createTime = responseData.data.create_time;
-    let videoID = responseData.data.id;
-
-    let videoFile;
-    try {
-      //fetch the video .MP4 from CDN
-      videoFile = await fetch(vidURL);
-    } catch (error) {
-      console.log(chalk.redBright('Error downloading video:'));
-      console.log(chalk.red(error));
+    //debug logging
+    if (process.env.NODE_ENV === 'dev') {
+      console.log(chalk.blueBright(JSON.stringify(responseData.data)));
+    }
+    let success = -1;
+    //call slideshow downloader for slideshows
+    if (responseData.data.duration === 0) {
+      success = await downloadSlideshow(dlFolder, responseData, vidDate);
       continue;
-    }
-
-    try {
-      //set filename and create a WriteStream
-      // ${vidDate}
-      let filename = `${dlFolder}/${vidDate}_${author}_${videoID}.mp4`;
-      let file = fs.createWriteStream(filename);
-      //write the response body to a file
-      file.on('finish', () => {
-        console.log(
-          chalk.greenBright(`Finished downloading video ` + favoriteURL)
-        );
-        file.close();
-      });
+    } else {
       console.log(chalk.blue(`Downloading video ${i}/${qLength}...`));
-      await pipeline(videoFile.body, file);
-    } catch (error) {
-      console.log(chalk.redBright('Error writing file to disk.'));
-      console.log(error);
+      success = await downloadVideo(dlFolder, responseData, vidDate);
     }
 
-    // write URL to history file after download is finished
-    writeHistory.write('\n' + favoriteURL);
-    DLCount++;
+    if (success === 0) {
+      console.log(
+        chalk.greenBright(`Finished downloading video ` + favoriteURL)
+      );
+      // write URL to history file after download is finished
+      writeHistory.write('\n' + favoriteURL);
+      DLCount++;
+    }
   }
 
   console.log(chalk.greenBright('Saved ' + DLCount + ' videos. Goodbye.'));
