@@ -138,7 +138,8 @@ async function readData(category) {
       let messages = info['Direct Messages']['Chat History']['ChatHistory'];
       Object.keys(messages).forEach(value => {
         let chat = messages[value];
-        chat[0].user = value.split(/\s+/).pop();
+        let name = value.split(/\s+/).pop();
+        chat[0].user = cleanFileName(name);
         list.push(chat);
       });
     }
