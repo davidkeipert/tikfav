@@ -67,9 +67,9 @@ export async function downloadSlideshow(dlFolder, responseData, date) {
     file.on('finish', () => {
       console.log(chalk.greenBright('Saved Slideshow Music!'));
       file.close();
-      return 0;
     });
     await pipeline(sound.body, file);
+    return 0;
   } catch (e) {
     console.log(chalk.red('Error saving music to disk: '));
     console.log(e);

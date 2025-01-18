@@ -205,7 +205,7 @@ async function downloader(list, category, apiKey, subFolder = '') {
     if (!favoriteURL.startsWith('https://')) {
       continue;
     }
-    if (history.indexOf(favoriteURL) != -1) {
+    if (history.indexOf(favoriteURL) !== -1) {
       console.log(chalk.magenta('Video was found in history file, skipping.'));
       continue;
     }
@@ -243,7 +243,6 @@ async function downloader(list, category, apiKey, subFolder = '') {
       console.log(chalk.blue(`Downloading video ${i}/${qLength}...`));
       success = await downloadVideo(dlFolder, responseData, vidDate);
     }
-
     if (success === 0) {
       console.log(
         chalk.greenBright(`Finished downloading video ` + favoriteURL)

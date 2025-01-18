@@ -31,9 +31,9 @@ export async function downloadVideo(dlFolder, responseData, date) {
     //write the response body to a file
     file.on('finish', () => {
       file.close();
-      return 0;
     });
     await pipeline(videoFile.body, file);
+    return 0;
   } catch (error) {
     console.log(chalk.redBright('Error writing file to disk.'));
     console.log(error);
