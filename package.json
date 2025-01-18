@@ -1,6 +1,6 @@
 {
   "name": "tikfav",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "type": "module",
   "description": "Download your tiktok favorites using the user data download files from tiktok",
   "main": "index.js",
