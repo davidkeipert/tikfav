@@ -186,14 +186,14 @@ async function downloader(list, category, apiKey, subFolder = '') {
 
   for (let i = 0; i < list.length; i++) {
     //set the property names for the video items in the list bc dm lists have a different naming scheme
-    let link = '';
+    let link = 'Link';
     let date = 'Date';
     if (category === 'messages') {
       link = 'Content';
-    } else {
-      link = 'Link';
+    } else if (category === 'liked') {
+      link = 'link';
+      date = 'date';
     }
-
     let qLength = list.length;
     let video = list[i];
     //get data from an entry in the Favorites list
