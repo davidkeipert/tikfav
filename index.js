@@ -9,7 +9,7 @@ import { pipeline } from 'stream/promises';
 import { openHistory } from './history.js';
 import { setTimeout } from 'timers/promises';
 import { getVideoData, getSoundData } from './videoInfo.js';
-import packageInfo from './package.json' assert { type: 'json' };
+import packageInfo from './package.json' with { type: 'json' };
 import { downloadSounds } from './downloadSounds.js';
 import { cleanFileName } from './utils.js';
 import 'dotenv/config';
